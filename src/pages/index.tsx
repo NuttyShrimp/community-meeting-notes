@@ -1,10 +1,9 @@
 import Head from "next/head";
+import { MeetingList } from "~/components/MeetingList";
 import { NavBar } from "~/components/Navbar";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   return (
     <>
       <Head>
@@ -13,6 +12,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <NavBar />
+      <MeetingList />
+      <div>
+      </div>
     </>
   );
 }

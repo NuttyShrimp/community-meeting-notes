@@ -37,7 +37,7 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
+    session: ({ session, user, token }) => ({
       ...session,
       user: {
         ...session.user,
@@ -50,6 +50,11 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: "identify email guilds"
+        }
+      }
     }),
     /**
      * ...add more providers here.

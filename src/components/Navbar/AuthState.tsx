@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LogOut } from "lucide-react";
 import { P } from "../Typography";
 
-export const Auth = () => {
+export const AuthState = () => {
   const { data: sessionData } = useSession();
   
   if (!sessionData) {
@@ -18,12 +18,12 @@ export const Auth = () => {
 
   return (
     <div className='flex items-center'>
-      <P>
+      <P className="mr-2">
         Welcome, {sessionData.user.name}
       </P>
       <DropdownMenu>
         <DropdownMenuTrigger>
-            <Avatar className="ml-2">
+            <Avatar>
               <AvatarImage src={sessionData.user.image ?? undefined} />
               <AvatarFallback>
                 {sessionData.user.name?.at(0) ?? "User"}
