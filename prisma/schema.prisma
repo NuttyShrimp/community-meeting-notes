@@ -63,17 +63,18 @@ model VerificationToken {
 }
 
 model Meeting {
-  id              Int               @id @default(autoincrement())
+  id              String            @id @default(cuid())
   title           String
   guildId         String
   locked          Boolean           @default(false)
   owner           String
   user            User              @relation(fields: [owner], references: [id], onDelete: Cascade)
   ManagementRoles ManagementRoles[]
+  Topic           Topic[]
 }
 
 model ManagementRoles {
-  meetingId Int
+  meetingId String
   roleId    String
   meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
@@ -81,9 +82,10 @@ model ManagementRoles {
 }
 
 model Topic {
-  id     Int    @id @default(autoincrement())
-  note   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-	@@map("Point")
+  id        Int     @id @default(autoincrement())
+  note      String
+  meetingId String
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
