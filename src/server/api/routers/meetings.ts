@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { prisma } from "~/server/db";
 import { TRPCError } from "@trpc/server";
+import { getUserGuilds } from "~/server/lib/discordFetch";
 
 export const meetingRouters = createTRPCRouter({
   list: publicProcedure.query(({ctx}) => {
@@ -12,6 +13,38 @@ export const meetingRouters = createTRPCRouter({
         owner: ctx.session?.user.id
       }
     })
+  }),
+  get: protectedProcedure.input(z.object({
+    id: z.string(),
+  })).query(async ({ctx, input}) => {
+    const meeting = await prisma.meeting.findFirst({
+      where: {
+        id: input.id,
+      },
+    });
+    if (!meeting) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No meeting found for this id",
+      })
+    }
+
+     // validate user is in guild of meeting
+    const guilds = await getUserGuilds(ctx.session.user.id);
+    const guild = guilds.find(g => g.id === meeting.guildId)
+    if (!guild) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not part of the guild where this meeting is being held",
+      });
+    }
+    
+    meeting.title = `${guild.name} - ${meeting.title}`
+
+    return {
+      ...meeting,
+      owner: meeting.owner === ctx.session.user.id,
+    };
   }),
   create: protectedProcedure.input(z.object({
     name: z.string(),
