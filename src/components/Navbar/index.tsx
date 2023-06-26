@@ -1,13 +1,17 @@
 import { H2 } from "../Typography"
 import { AuthState } from "./AuthState"
 
-export const NavBar = () => {
+declare interface NavBarProps {
+  title?: string;
+}
+
+export const NavBar = (props: NavBarProps) => {
   return (
     <div className="h-full flex-1 space-y-8 p-8">
     <div className="md:flex items-center justify-between space-y-2">
         <div>
           <H2>
-            DeGrens community meeting notes
+            {props.title ?? ""}
           </H2>
         </div>
         <div>

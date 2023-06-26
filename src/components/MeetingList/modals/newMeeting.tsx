@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { PropsWithChildren, useState } from "react";
 import { GuildSelector } from "~/components/GuildSelector";
 import { P } from "~/components/Typography";
@@ -11,17 +12,19 @@ export const NewMeetingDialog = ({children}: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [guild, setGuild] = useState("");
-  const createMut = api.meetings.create.useMutation();
+  const utils = api.useContext();
+  const createMut = api.meetings.create.useMutation({
+    onSuccess() {
+      void utils.meetings.list.invalidate();
+      setOpen(false);
+    }
+  });
 
   const createMeeting = () => {
     createMut.mutate({
       guild,
       name,
     })
-  }
-
-  if (createMut.isSuccess) {
-    setOpen(false);
   }
 
   return (

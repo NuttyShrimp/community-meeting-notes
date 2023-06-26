@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { MeetingList } from "~/components/MeetingList";
 import { NavBar } from "~/components/Navbar";
-import { api } from "~/utils/api";
 
 export default function Home() {
   return (
