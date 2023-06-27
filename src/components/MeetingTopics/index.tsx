@@ -1,13 +1,16 @@
 import { NewMeetingTopic } from "./NewMeetingTopic"
 
 declare interface MeetingTopicsProps {
-  meetingId: string;
+  meeting: {
+    id: string;
+    locked: boolean;
+  }
 }
 
-export const MeetingTopics = (props: MeetingTopicsProps) => {
+export const MeetingTopics = ({ meeting }: MeetingTopicsProps) => {
   return (
     <>
-      <NewMeetingTopic meetingId={props.meetingId} />
+      <NewMeetingTopic locked={meeting.locked} meetingId={meeting.id} />
     </>
   )
 }

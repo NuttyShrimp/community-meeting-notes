@@ -71,5 +71,31 @@ export const meetingRouters = createTRPCRouter({
         guildId: input.guild,
       }
     })
+  }),
+  lock: protectedProcedure.input(z.object({
+    meetingId: z.string(),
+    isLocked: z.boolean(),
+  })).mutation(async ({ctx, input}) => {
+    const meeting = await prisma.meeting.findFirst({
+      where: {
+        id: input.meetingId,
+        owner: ctx.session.user.id
+      }
+    });
+    if (!meeting) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: 'You cant (un)lock a meeting you are not the owner of'
+      })
+    }
+
+    await prisma.meeting.update({
+      data: {
+        locked: input.isLocked,
+      },
+      where:{
+        id: input.meetingId,
+      }
+    })
   })
 })

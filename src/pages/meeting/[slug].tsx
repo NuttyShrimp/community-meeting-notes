@@ -19,8 +19,6 @@ const MeetingView = () => {
   }, {
     refetchOnWindowFocus: false,
     refetchInterval: false,
-    refetchOnMount: 'always',
-    retry: false,
     
   });
 
@@ -57,8 +55,8 @@ const MeetingView = () => {
     <>
       <NavBar title={meeting.title} />
       <div className="px-8">
-        {meeting.owner && <MeetingAdminControls />}
-        <MeetingTopics meetingId={router.query.slug}  />
+        {meeting.owner && <MeetingAdminControls meeting={meeting} />}
+        <MeetingTopics meeting={meeting} />
       </div>
     </>
   )

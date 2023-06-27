@@ -13,12 +13,21 @@ export const topicRouter = createTRPCRouter({
         id: input.meetingId,
       }
     });
+
     if (!meeting) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "No meeting found for the topic to be posted to",
       })
     }
+
+    if (meeting.locked) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "This meeting is locked, no new topics are allowed"
+      });
+    }
+
     await prisma.topic.create({
       data: {
         userId: ctx.session.user.id,
