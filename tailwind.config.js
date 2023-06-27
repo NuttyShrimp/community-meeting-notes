@@ -3,7 +3,8 @@ module.exports = {
   darkMode: ["class"],
   content: [
     './src/**/*.{ts,tsx}',
-	],
+  ],
+  safelist: ["dark"],
   theme: {
     container: {
       center: true,
