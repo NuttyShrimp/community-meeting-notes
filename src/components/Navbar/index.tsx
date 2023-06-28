@@ -7,8 +7,8 @@ declare interface NavBarProps {
 
 export const NavBar = (props: NavBarProps) => {
   return (
-    <div className="h-full flex-1 space-y-8 p-8">
-    <div className="md:flex items-center justify-between space-y-2">
+    <div className="h-full flex-1 space-y-8 p-8 pb-2">
+      <div className="md:flex items-center justify-between space-y-2">
         <div>
           <H2>
             {props.title ?? ""}

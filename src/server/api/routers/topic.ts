@@ -35,5 +35,100 @@ export const topicRouter = createTRPCRouter({
         note: input.message,
       }
     })
+  }),
+  get: protectedProcedure.input(z.object({
+    meetingId: z.string(),
+  })).query(({ input }) => {
+    return prisma.topic.findMany({
+      where: {
+        meetingId: input.meetingId,
+      },
+      include: {
+        user: true,
+      }
+    })
+  }),
+  delete: protectedProcedure.input(z.object({
+    topicId: z.number(),
+  })).mutation(async ({ ctx, input }) => {
+    const topic = await prisma.topic.findFirst({
+      where: {
+        id: input.topicId,
+        OR: [
+          {
+            userId: ctx.session.user.id,
+          },
+          {
+            meeting: {
+              owner: ctx.session.user.id
+            }
+          }
+        ]
+      }
+    });
+
+    if (!topic) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You do not have the rights to do that"
+      });
+    }
+
+    await prisma.topic.delete({
+      where: {
+        id: input.topicId
+      }
+    })
+  }),
+
+  // TODO: move to seperate router
+  addComment: protectedProcedure.input(z.object({
+    topicId: z.number(),
+    comment: z.string(),
+  })).mutation(async ({ ctx, input }) => {
+    await prisma.topicComment.create({
+      data: {
+        topicId: input.topicId,
+        note: input.comment,
+        userId: ctx.session.user.id
+      }
+    })
+  }),
+  getComments: protectedProcedure.input(z.object({
+    topicId: z.number()
+  })).query(async ({ input }) => {
+    return await prisma.topicComment.findMany({
+      where: {
+        topicId: input.topicId,
+      },
+      include: {
+        user: true
+      }
+    })
+  }),
+  deleteComment: protectedProcedure.input(z.object({
+    commentId: z.number()
+  })).mutation(async ({ ctx, input }) => {
+    const meeting = await prisma.topicComment.findFirst({
+      where: {
+        id: input.commentId,
+        topic: {
+          meeting: {
+            owner: ctx.session.user.id,
+          }
+        }
+      }
+    })
+    if (!meeting) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You cannot do this operation"
+      })
+    }
+    await prisma.topicComment.delete({
+      where: {
+        id: input.commentId,
+      }
+    })
   })
 })
