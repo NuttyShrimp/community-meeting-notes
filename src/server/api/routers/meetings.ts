@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { prisma } from "~/server/db";
 import { TRPCError } from "@trpc/server";
 import { getUserGuilds } from "~/server/lib/discordFetch";
+import { log } from "next-axiom";
 
 export const meetingRouters = createTRPCRouter({
   list: publicProcedure.query(({ ctx }) => {
@@ -70,6 +71,10 @@ export const meetingRouters = createTRPCRouter({
         title: input.name,
         guildId: input.guild,
       }
+    })
+    log.info("created a new meeting", {
+      input,
+      user: ctx.session.user,
     })
   }),
   lock: protectedProcedure.input(z.object({

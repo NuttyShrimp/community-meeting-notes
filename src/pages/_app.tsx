@@ -4,6 +4,7 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { ThemeProvider } from "next-themes";
+export { reportWebVitals } from 'next-axiom';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

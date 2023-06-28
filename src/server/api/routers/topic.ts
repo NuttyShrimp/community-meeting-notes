@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { prisma } from "~/server/db";
 import { TRPCError } from "@trpc/server";
+import { log } from "next-axiom";
 
 export const topicRouter = createTRPCRouter({
   add: protectedProcedure.input(z.object({
@@ -34,6 +35,10 @@ export const topicRouter = createTRPCRouter({
         meetingId: input.meetingId,
         note: input.message,
       }
+    })
+    log.info("added a new topic to a meeting", {
+      input,
+      user: ctx.session.user,
     })
   }),
   get: protectedProcedure.input(z.object({
@@ -79,6 +84,10 @@ export const topicRouter = createTRPCRouter({
         id: input.topicId
       }
     })
+    log.info("deleted a new topic to a meeting", {
+      input,
+      user: ctx.session.user,
+    })
   }),
 
   // TODO: move to seperate router
@@ -92,6 +101,10 @@ export const topicRouter = createTRPCRouter({
         note: input.comment,
         userId: ctx.session.user.id
       }
+    })
+    log.info("added a comment to a topic", {
+      input,
+      user: ctx.session.user,
     })
   }),
   getComments: protectedProcedure.input(z.object({
@@ -136,6 +149,10 @@ export const topicRouter = createTRPCRouter({
       where: {
         id: input.commentId,
       }
+    })
+    log.info("deleted a comment from a topic", {
+      input,
+      user: ctx.session.user,
     })
   })
 })
