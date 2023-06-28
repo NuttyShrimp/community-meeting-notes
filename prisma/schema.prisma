@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 // Necessary for Next auth
@@ -25,7 +26,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
 }
@@ -35,7 +36,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -65,7 +66,7 @@ model Meeting {
   guildId         String
   locked          Boolean           @default(false)
   owner           String
-  user            User              @relation(fields: [owner], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [owner], references: [id])
   ManagementRoles ManagementRoles[]
   Topic           Topic[]
 
@@ -75,7 +76,7 @@ model Meeting {
 model ManagementRoles {
   meetingId String
   roleId    String
-  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meeting   Meeting @relation(fields: [meetingId], references: [id])
 
   @@id([meetingId, roleId])
 }
@@ -85,8 +86,8 @@ model Topic {
   note         String
   meetingId    String
   userId       String
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  meeting      Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id])
+  meeting      Meeting        @relation(fields: [meetingId], references: [id])
   TopicComment TopicComment[]
 }
 
@@ -95,6 +96,6 @@ model TopicComment {
   note    String
   topicId Int
   userId  String
-  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic   Topic  @relation(fields: [topicId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
 }
