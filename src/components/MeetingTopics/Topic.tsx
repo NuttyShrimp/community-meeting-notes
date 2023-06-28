@@ -5,7 +5,7 @@ import { Button, type ButtonProps } from "../ui/button";
 import { useCallback, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { api } from "~/utils/api";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Alert, AlertDescription } from "../ui/alert";
 import { Skeleton } from "../ui/skeleton";
 import { useSession } from "next-auth/react";
 

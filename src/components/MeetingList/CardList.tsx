@@ -2,7 +2,7 @@ import { api } from "~/utils/api"
 import { Skeleton } from "../ui/skeleton";
 import { useErrorToast } from "~/lib/hooks/useErrorToast";
 import { Card, CardContent } from "../ui/card";
-import { H3, P } from "../Typography";
+import { P } from "../Typography";
 import { Button } from "../ui/button";
 import { PlusIcon } from "lucide-react";
 import { NewMeetingDialog } from "./modals/newMeeting";

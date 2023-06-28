@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { getUserGuilds } from "~/server/lib/discordFetch";
 
 export const meetingRouters = createTRPCRouter({
-  list: publicProcedure.query(({ctx}) => {
+  list: publicProcedure.query(({ ctx }) => {
     if (!ctx.session?.user.id) return [];
 
     return ctx.prisma.meeting.findMany({
@@ -16,7 +16,7 @@ export const meetingRouters = createTRPCRouter({
   }),
   get: protectedProcedure.input(z.object({
     id: z.string(),
-  })).query(async ({ctx, input}) => {
+  })).query(async ({ ctx, input }) => {
     const meeting = await prisma.meeting.findFirst({
       where: {
         id: input.id,
@@ -29,7 +29,7 @@ export const meetingRouters = createTRPCRouter({
       })
     }
 
-     // validate user is in guild of meeting
+    // validate user is in guild of meeting
     const guilds = await getUserGuilds(ctx.session.user.id);
     const guild = guilds.find(g => g.id === meeting.guildId)
     if (!guild) {
@@ -38,8 +38,8 @@ export const meetingRouters = createTRPCRouter({
         message: "You are not part of the guild where this meeting is being held",
       });
     }
-    
-    meeting.title = `${guild.name} - ${meeting.title}`
+
+    meeting.title = `${guild.name ?? "Unknown guild"} - ${meeting.title}`
 
     return {
       ...meeting,
@@ -49,7 +49,7 @@ export const meetingRouters = createTRPCRouter({
   create: protectedProcedure.input(z.object({
     name: z.string(),
     guild: z.string(),
-  })).mutation(async ({ctx, input}) => {
+  })).mutation(async ({ ctx, input }) => {
     const meeting = await prisma.meeting.findFirst({
       where: {
         owner: ctx.session.user.id,
@@ -75,7 +75,7 @@ export const meetingRouters = createTRPCRouter({
   lock: protectedProcedure.input(z.object({
     meetingId: z.string(),
     isLocked: z.boolean(),
-  })).mutation(async ({ctx, input}) => {
+  })).mutation(async ({ ctx, input }) => {
     const meeting = await prisma.meeting.findFirst({
       where: {
         id: input.meetingId,
@@ -93,7 +93,7 @@ export const meetingRouters = createTRPCRouter({
       data: {
         locked: input.isLocked,
       },
-      where:{
+      where: {
         id: input.meetingId,
       }
     })

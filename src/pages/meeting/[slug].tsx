@@ -1,4 +1,5 @@
-import { AlertTriangle, Triangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/router"
 import { MeetingAdminControls } from "~/components/MeetingAdmin/Controls";
 import { MeetingTopics } from "~/components/MeetingTopics"
@@ -42,7 +43,12 @@ const MeetingView = () => {
             <Button variant={"secondary"} onClick={() => {
               void router.push("/")
             }}>
-              To meetinglist
+              To Meetings
+            </Button>
+            <Button variant={"secondary"} onClick={() => {
+              void signIn();
+            }}>
+              Sign In
             </Button>
           </div>
         </div>

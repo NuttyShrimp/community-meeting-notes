@@ -1,5 +1,4 @@
-import { useRouter } from "next/router";
-import { PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 import { GuildSelector } from "~/components/GuildSelector";
 import { P } from "~/components/Typography";
 import { Button } from "~/components/ui/button";
@@ -8,7 +7,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { api } from "~/utils/api";
 
-export const NewMeetingDialog = ({children}: PropsWithChildren) => {
+export const NewMeetingDialog = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [guild, setGuild] = useState("");
