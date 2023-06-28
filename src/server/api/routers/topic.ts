@@ -112,11 +112,18 @@ export const topicRouter = createTRPCRouter({
     const meeting = await prisma.topicComment.findFirst({
       where: {
         id: input.commentId,
-        topic: {
-          meeting: {
-            owner: ctx.session.user.id,
+        OR: [
+          {
+            userId: ctx.session.user.id,
+          },
+          {
+            topic: {
+              meeting: {
+                owner: ctx.session.user.id,
+              }
+            }
           }
-        }
+        ]
       }
     })
     if (!meeting) {
