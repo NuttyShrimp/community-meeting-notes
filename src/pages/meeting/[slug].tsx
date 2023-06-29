@@ -1,6 +1,8 @@
 import { AlertTriangle } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { NextPage } from "next";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router"
+import { useEffect } from "react";
 import { MeetingAdminControls } from "~/components/MeetingAdmin/Controls";
 import { MeetingTopics } from "~/components/MeetingTopics"
 import { NavBar } from "~/components/Navbar";
@@ -8,19 +10,37 @@ import { H3, P } from "~/components/Typography";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
 
-const MeetingView = () => {
+const MeetingView: NextPage = () => {
   const router = useRouter()
 
-  if (!router.query.slug || Array.isArray(router.query.slug)) {
-    return null;
-  }
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status !== 'loading' && !session) {
+      void signIn();
+    }
+  }, [status, session])
 
   const { isLoading, isError, error, data: meeting } = api.meetings.get.useQuery({
-    id: router.query.slug,
+    id: router.query.slug !== undefined ? Array.isArray(router.query.slug) ? router.query.slug?.[0] ?? "" : router.query.slug : "",
   }, {
     refetchOnWindowFocus: false,
     refetchInterval: false,
+    enabled: !!router.query.slug
   });
+
+  if (status === "loading") {
+    return (
+      <div className="mx-auto container">
+        <H3 className="text-center">Loading account information...</H3>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return <div>Redirecting to signin</div>
+  }
+
 
   if (isLoading) {
     return (
