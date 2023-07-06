@@ -99,7 +99,8 @@ export const authOptions: NextAuthOptions = {
         params: {
           scope: "identify email guilds"
         }
-      }
+      },
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   session: {
