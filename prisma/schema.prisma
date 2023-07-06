@@ -83,7 +83,7 @@ model ManagementRoles {
 
 model Topic {
   id           Int            @id @default(autoincrement())
-  note         String
+  note         String         @db.LongText
   meetingId    String
   userId       String
   user         User           @relation(fields: [userId], references: [id])
@@ -93,7 +93,7 @@ model Topic {
 
 model TopicComment {
   id      Int    @id @default(autoincrement())
-  note    String
+  note    String @db.LongText
   topicId Int
   userId  String
   topic   Topic  @relation(fields: [topicId], references: [id])
