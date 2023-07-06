@@ -4,6 +4,7 @@ import {
   getServerSession,
   type NextAuthOptions,
   type DefaultSession,
+  TokenSet,
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import { env } from "~/env.mjs";
@@ -22,6 +23,7 @@ declare module "next-auth" {
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
+    error?: "RefreshAccessTokenError"
   }
 
   // interface User {
@@ -37,13 +39,56 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const [discord] = await prisma.account.findMany({
+        where: { userId: user.id, provider: "discord" },
+      })
+      if (discord && discord.refresh_token && (discord.expires_at === null || discord.expires_at * 1000 < Date.now())) {
+        // If the access token has expired, try to refresh it
+        try {
+          const response = await fetch("https://discord.com/api/oauth2/token", {
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              client_id: env.DISCORD_CLIENT_ID,
+              client_secret: env.DISCORD_CLIENT_SECRET,
+              grant_type: "refresh_token",
+              refresh_token: discord.refresh_token,
+            }),
+            method: "POST",
+          })
+
+          const tokens: TokenSet = await response.json() as TokenSet
+
+          if (!response.ok) throw tokens
+
+          await prisma.account.update({
+            data: {
+              access_token: tokens.access_token,
+              expires_at: Math.floor(Date.now() / 1000 + (tokens.expires_in as number)),
+              refresh_token: tokens.refresh_token ?? discord.refresh_token,
+            },
+            where: {
+              provider_providerAccountId: {
+                provider: "discord",
+                providerAccountId: discord.providerAccountId,
+              },
+            },
+          })
+        } catch (error) {
+          console.error("Error refreshing access token", error)
+          // The error property will be used client-side to handle the refresh token error
+          session.error = "RefreshAccessTokenError"
+        }
+      }
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+        },
+      }
+    }
   },
   adapter: PrismaAdapter(prisma),
   providers: [

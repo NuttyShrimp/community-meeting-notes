@@ -1,9 +1,16 @@
-import { useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { P } from "../Typography";
 import { MeetingCardList } from "./CardList";
+import { useEffect } from "react";
 
 export const MeetingList = () => {
-  const {data:sessionData} = useSession();
+  const { data: sessionData } = useSession();
+
+  useEffect(() => {
+    if (sessionData?.error === "RefreshAccessTokenError") {
+      void signIn(); // Force sign in to hopefully resolve error
+    }
+  }, [sessionData]);
 
   if (!sessionData) {
     return (
